@@ -8,7 +8,7 @@ const nextConfig = {
     return [
       {
         // matching all API routes
-        source: '/:path*',
+        source: 'https://intelli-pic.vercel.app',
         headers: [
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
           { key: 'Access-Control-Allow-Origin', value: '*' },
