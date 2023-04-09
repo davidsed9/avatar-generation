@@ -11,7 +11,7 @@ import styles from "./Home.module.css";
 import Header from "../components/Header";
 import classNames from "classnames";
 
-const BASETEN_PROJECT_ROUTE = "https://app.baseten.co/routes/XXXXXXX";
+const BASETEN_PROJECT_ROUTE = "https://app.baseten.co/routes/V0NdMvq";
 const FINETUNING_BUCKET = "fine-tuning-bucket"; // Update to the bucket name you chose on Supabase Storage
 
 async function post(url: string, body: any, callback: any) {
@@ -96,21 +96,23 @@ export default function Home() {
   }
 
   async function getOrInsertUserData(user: any) {
-    await fetch(`${BASETEN_PROJECT_ROUTE}/user_data?user_id=${user.id}`)
-      .then((response) => response.json())
-      .then((data) => setFinetuningData(data.output));
-    setReady(true);
-  }
+  await fetch(`${BASETEN_PROJECT_ROUTE}/user_data?user_id=${user.id}`)
+  .then((response) => response.json())
+  .then((data) => setFinetuningData(data.output));
+
+  setReady(true);
+}
 
   async function getModelStatus(user: any) {
     await fetch(`${BASETEN_PROJECT_ROUTE}/model_status?user_id=${user.id}`)
       .then((response) => response.json())
-      .then((data) =>
+      .then((data) => {
+        console.log(data)
         setModelStatus({
           modelId: data.output.model_id,
           healthy: data.output.healthy,
         })
-      );
+      });
 
     setReady(true);
   }
