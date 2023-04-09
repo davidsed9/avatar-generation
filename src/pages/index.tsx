@@ -96,21 +96,23 @@ export default function Home() {
   }
 
   async function getOrInsertUserData(user: any) {
-    await fetch(`${BASETEN_PROJECT_ROUTE}/user_data?user_id=${user.id}`)
-      .then((response) => response.json())
-      .then((data) => setFinetuningData(data.output));
-    setReady(true);
-  }
+  await fetch(`${BASETEN_PROJECT_ROUTE}/user_data?user_id=${user.id}`)
+  .then((response) => response.json())
+  .then((data) => setFinetuningData(data.output));
+
+  setReady(true);
+}
 
   async function getModelStatus(user: any) {
     await fetch(`${BASETEN_PROJECT_ROUTE}/model_status?user_id=${user.id}`)
       .then((response) => response.json())
-      .then((data) =>
+      .then((data) => {
+        console.log(data)
         setModelStatus({
           modelId: data.output.model_id,
           healthy: data.output.healthy,
         })
-      );
+      });
 
     setReady(true);
   }
