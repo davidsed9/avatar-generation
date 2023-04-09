@@ -11,8 +11,8 @@ import styles from "./Home.module.css";
 import Header from "../components/Header";
 import classNames from "classnames";
 
-const BASETEN_PROJECT_ROUTE = "https://app.baseten.co/routes/XXXXXXX";
-const FINETUNING_BUCKET = "fine-tuning-bucket"; // Update to the bucket name you chose on Supabase Storage
+  const BASETEN_PROJECT_ROUTE = "https://app.baseten.co/routes/XP9Z8Wq"
+  const FINETUNING_BUCKET = "intelli-pic"; // Update to the bucket name you chose on Supabase Storage
 
 async function post(url: string, body: any, callback: any) {
   await fetch(url, {
