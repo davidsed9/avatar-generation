@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 // next.config.js
-module.exports = {
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+
   async headers() {
     return [
       {
@@ -23,3 +26,5 @@ module.exports = {
     ];
   },
 };
+
+module.exports = nextConfig;
