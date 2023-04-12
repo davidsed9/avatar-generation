@@ -2,14 +2,14 @@
 import baseten
 from baseten import route
 from baseten.models import StableDiffusionPipeline
-from baseten.training import PublicUrl, DreamboothConfig, FinetuningRun
+from baseten.training import Public , DreamboothConfig, FinetuningRun
 
 from datetime import datetime
 from supabase import create_client
 
-SUPABASE_PREFIX_URL = "SUPABASE_PREFIX_URL" # Include trailing forward-slash
-SUPABASE_KEY = "SUPABASE_KEY"
-BASETEN_API_KEY = "BASETEN_API_KEY"
+SUPABASE_PREFIX_URL = "" # Include trailing forward-slash
+SUPABASE_KEY = ""
+BASETEN_API_KEY = ""
 SUPABASE_TABLE_NAME = "finetuningruns"
 SUPABASE_BUCKET_NAME = "fine-tuning-bucket"
 SUPABASE_OBJECT_URL = f"{SUPABASE_PREFIX_URL}storage/v1/object/public/{SUPABASE_BUCKET_NAME}/"
@@ -66,13 +66,19 @@ def fine_tune_model(request):
     user_id = request_body.get("user_id")
     now = datetime.now() # current date and time
     name_of_model = f'{user_id} training run {now.strftime("%m/%d/%Y, %H:%M:%S")}'
-    instance_prompt = request_body.get("prompt")
+     instance_prompt = request_body.get("prompt") # Unique Identifier for the object
+    instance_prompt = "photo of " + instance_prompt 
+    class_prompt = request_body.get("instance_type") # Type of the object
+    class_prompt = "a photo of a " + class_prompt
     dataset = PublicUrl(f'{SUPABASE_OBJECT_URL}{url}')
+     # DreamboothConfig Reference: https://docs.blueprint.baseten.co/reference/python/DreamboothConfig/
     config = DreamboothConfig(
         instance_prompt=instance_prompt,
+         class_prompt=class_prompt,
         input_dataset=dataset,
-        train_text_encoder=False,
-        max_train_steps=1300
+        train_text_encoder=True,
+        max_train_steps=850,
+        pretrained_model_name_or_path="stabilityai/stable-diffusion-2-1" # 
     )
     run = FinetuningRun.create(
         trained_model_name=name_of_model,
@@ -91,7 +97,7 @@ def call_model(request):
     instance_prompt = request_body.get("instance_prompt")
     run_id = request_body.get("run_id")
     run = FinetuningRun(run_id)
-    model = run.deployed_model
+     model = StableDiffusionPipeline(model_id=run.deployed_model._model_id)
     image, url = model(instance_prompt)
     return {
         "url": url

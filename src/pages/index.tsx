@@ -11,8 +11,8 @@ import styles from "./Home.module.css";
 import Header from "../components/Header";
 import classNames from "classnames";
 
-const BASETEN_PROJECT_ROUTE = "https://app.baseten.co/routes/XP9Z8Wq"
-const FINETUNING_BUCKET = "fine-tuning-bucket"; // Update to the bucket name you chose on Supabase Storage
+const BASETEN_PROJECT_ROUTE = "https://app.baseten.co/routes/XP9ZMEq"
+const FINETUNING_BUCKET = "intelli-pic"; // Update to the bucket name you chose on Supabase Storage
 
 async function post(url: string, body: any, callback: any) {
   await fetch(url, {
@@ -66,6 +66,8 @@ export default function Home() {
   const [uploading, setUploading] = useState(false);
   const [queueingFinetuning, setQueueingFinetuning] = useState(false);
   const [instanceName, setInstanceName] = useState("");
+   // Instance Type that defaults to "Man"
+   const [instanceType, setInstanceType] = useState("Man");
 
   useEffect(() => {
     if (!user) {
@@ -102,20 +104,37 @@ export default function Home() {
 
   setReady(true);
 }
+// async function getModelStatus(user: any) {
+//   await fetch(`${BASETEN_PROJECT_ROUTE}/model_status?user_id=${user.id}`)
+//     .then((response) => response.json())
+//     .then((data) => {
+//       console.log(data);
+//       if (data && data.output) {
+//         setModelStatus({
+//           modelId: data.output.model_id,
+//           healthy: data.output.healthy,
+//         });
+//       } else {
+//         console.error('Error: data.output is undefined', data);
+//       }
+//     });
 
-  async function getModelStatus(user: any) {
-    await fetch(`${BASETEN_PROJECT_ROUTE}/model_status?user_id=${user.id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data)
-        setModelStatus({
-          modelId: data.output.model_id,
-          healthy: data.output.healthy,
-        })
-      });
+//   setReady(true);
+// }
 
-    setReady(true);
-  }
+async function getModelStatus(user: any) {
+  await fetch(`${BASETEN_PROJECT_ROUTE}/model_status?user_id=${user.id}`)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data)
+      setModelStatus({
+        modelId: data.output.model_id,
+        healthy: data.output.healthy,
+      })
+    });
+
+  setReady(true);
+}
 
   async function handleFileUpload(ev: React.ChangeEvent<HTMLInputElement>) {
     setUploading(true);
@@ -154,6 +173,7 @@ export default function Home() {
     });
   }
 
+   // Include instanceType on the object sent to Blueprint with the name instance_type
   async function handleValidationAndFinetuningStart() {
     setQueueingFinetuning(true);
     await post(
@@ -161,6 +181,7 @@ export default function Home() {
       {
         url: fineTuningData.dataset,
         prompt: instanceName,
+        instance_type: instanceType,
         user_id: user?.id,
       },
       (data: any) => console.log(data)
@@ -178,7 +199,7 @@ export default function Home() {
       },
       (data: any) => {
         const {
-          output: { url },
+          output: { url } = { url: null },
         } = data;
         setImageUrl(url);
       }
@@ -265,6 +286,14 @@ export default function Home() {
                     onChange={(ev) => setInstanceName(ev.target.value)}
                     placeholder={"Unique instance name"}
                   />
+                  {/* New select for the instance type */}
+                  <select name="instance_type" id="ip" className={styles.instance} onChange={(ev) => setInstanceType(ev.target.value)}>
+                  <option value="man">Man</option>
+                    <option value="woman">Woman</option>
+                    <option value="dog">Dog</option>
+                    <option value="cat">Cat</option>
+                    <option value="thing">Thing</option>
+                  </select>
                   <button
                     disabled={
                       instanceName.length === 0 ||
